@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Szatirikus, kitalált hír egy fiktív hírportálon. Semmi sem igaz belőle.">
+<style>
+  :root{
+    --navy:#0d1b2a;
+    --navy-2:#16263a;
+    --yellow:#ffd60a;
+    --teal:#00b4a6;
+    --ink:#111418;
+    --muted:#5f6b7a;
+    --line:#e6e9ee;
+    --bg:#ffffff;
+    --soft:#f5f7fa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+
+  /* Paródia sáv */
+  .parody-bar{
+    background:var(--yellow);color:var(--navy);font-size:13px;font-weight:700;
+    text-align:center;padding:6px 12px;letter-spacing:.02em
+  }
+
+  /* Fejléc */
+  header{background:var(--navy);color:#fff;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .head-row{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:26px;letter-spacing:-.03em}
+  .logo-mark{
+    width:34px;height:34px;border-radius:8px;background:var(--yellow);color:var(--navy);
+    display:grid;place-items:center;font-size:18px;font-weight:900;transform:rotate(-6deg)
+  }
+  .logo span.dot{color:var(--teal)}
+  nav ul{display:flex;list-style:none;gap:22px;font-size:15px;font-weight:600}
+  nav a{opacity:.85;transition:opacity .15s,color .15s}
+  nav a:hover{opacity:1;color:var(--yellow)}
+  nav a.active{color:var(--yellow);opacity:1}
+  .head-actions{display:flex;align-items:center;gap:12px}
+  .btn-support{
+    background:var(--teal);color:#fff;font-weight:700;font-size:14px;
+    padding:8px 14px;border-radius:999px;white-space:nowrap
+  }
+  .burger{display:none;background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
+  .subnav{background:var(--navy-2);font-size:13px;color:#c9d3df}
+  .subnav .wrap{display:flex;gap:18px;overflow-x:auto;padding-top:8px;padding-bottom:8px;white-space:nowrap}
+  .subnav b{color:var(--yellow)}
+
+  /* Hirdetések */
+  .ad{
+    position:relative;border-radius:10px;overflow:hidden;
+    border:1px dashed #c4ccd6;background:var(--soft)
+  }
+  .ad-label{
+    position:absolute;top:6px;left:8px;font-size:10px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:rgba(255,255,255,.85);background:rgba(0,0,0,.35);
+    padding:2px 6px;border-radius:4px;z-index:2
+  }
+  .ad-leader{margin:20px auto;max-width:970px}
+  .ad-leader .ad-inner{
+    min-height:110px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:22px 28px;color:#fff;
+    background:
+      repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 12px,transparent 12px 24px),
+      linear-gradient(90deg,#00a83e,#22d36b 55%,#ffe600);
+  }
+  .ad-leader h3{font-size:30px;font-weight:900;line-height:1.05;text-shadow:3px 3px 0 #005c22;text-transform:uppercase}
+  .ad-leader p{font-size:14px;font-weight:600;opacity:.95}
+  .ad-cta{
+    display:inline-block;background:#ff2d55;color:#fff;font-weight:900;padding:12px 18px;border-radius:8px;
+    text-transform:uppercase;font-size:14px;box-shadow:0 4px 0 #a3001f;white-space:nowrap;
+    animation:pulse 1.2s infinite;cursor:pointer;border:0
+  }
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .tiny{font-size:10px;opacity:.75;margin-top:4px}
+
+  /* Elrendezés */
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:48px;margin-top:10px;margin-bottom:60px}
+
+  /* Cikk */
+  .breadcrumbs{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .breadcrumbs a:hover{color:var(--teal)}
+  .tag{
+    display:inline-block;background:var(--yellow);color:var(--navy);font-weight:800;font-size:12px;
+    text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:4px;margin-right:6px
+  }
+  .tag.teal{background:var(--teal);color:#fff}
+  h1{
+    font-size:clamp(28px,4.2vw,46px);line-height:1.12;font-weight:900;letter-spacing:-.02em;
+    margin:14px 0 18px
+  }
+  .lead{
+    font-size:clamp(18px,2vw,21px);font-weight:600;line-height:1.5;color:#2a323c;
+    border-left:5px solid var(--teal);padding-left:16px;margin-bottom:22px
+  }
+  .meta{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin-bottom:26px
+  }
+  .author{display:flex;align-items:center;gap:12px}
+  .avatar{
+    width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--navy));
+    color:#fff;display:grid;place-items:center;font-weight:800
+  }
+  .author b{display:block;font-size:15px}
+  .author small{color:var(--muted);font-size:13px}
+  .share{display:flex;gap:8px;flex-wrap:wrap}
+  .share button{
+    border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;
+    font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;color:var(--ink)
+  }
+  .share button:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .share .ic{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#fff}
+
+  .hero{
+    border-radius:12px;overflow:hidden;margin-bottom:8px;position:relative;aspect-ratio:16/8;
+    background:
+      radial-gradient(circle at 30% 40%,rgba(0,180,166,.55),transparent 45%),
+      radial-gradient(circle at 75% 60%,rgba(255,214,10,.45),transparent 40%),
+      linear-gradient(135deg,#0d1b2a,#24124a);
+    display:grid;place-items:center;color:#fff
+  }
+  .hero-scene{text-align:center;padding:20px}
+  .hero-emoji{font-size:clamp(60px,10vw,110px);display:inline-block;animation:dance .6s infinite alternate ease-in-out}
+  @keyframes dance{from{transform:rotate(-12deg) translateY(0)}to{transform:rotate(12deg) translateY(-10px)}}
+  .hero-scene .err{
+    font-family:"Courier New",monospace;font-size:clamp(12px,1.6vw,16px);color:#ff5f7a;margin-top:12px;
+    background:rgba(0,0,0,.4);display:inline-block;padding:6px 12px;border-radius:6px
+  }
+  .live{
+    position:absolute;top:14px;left:14px;background:#e3002b;color:#fff;font-weight:800;font-size:12px;
+    padding:4px 10px;border-radius:4px;letter-spacing:.1em
+  }
+  .hero.has-video{aspect-ratio:16/9;background:#000}
+  .hero iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .dance-figs{margin:6px 0 30px}
+  .dance-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .dance-grid div{position:relative;border-radius:10px;overflow:hidden;background:#1a6fd6}
+  .dance-grid img{display:block;width:100%;height:auto}
+  .dance-grid span{position:absolute;left:8px;bottom:8px;background:var(--yellow);color:var(--navy);font-weight:800;font-size:12px;padding:3px 8px;border-radius:4px}
+  .dance-figs figcaption{font-size:13px;color:var(--muted);margin-top:8px}
+  @media (max-width:600px){.dance-grid{grid-template-columns:1fr}}
+  .caption{font-size:13px;color:var(--muted);margin-bottom:28px}
+
+  .body p{font-size:18px;line-height:1.75;margin-bottom:22px;color:#1d232b}
+  .body p:first-of-type::first-letter{
+    float:left;font-size:64px;line-height:.9;font-weight:900;margin:6px 10px 0 0;color:var(--teal)
+  }
+  .body h2{font-size:24px;font-weight:800;margin:34px 0 14px;letter-spacing:-.01em}
+  blockquote{
+    margin:28px 0;padding:20px 24px;background:var(--soft);border-radius:10px;
+    border-left:6px solid var(--yellow);font-size:20px;font-weight:700;line-height:1.45
+  }
+  blockquote cite{display:block;font-size:14px;font-weight:600;color:var(--muted);margin-top:10px;font-style:normal}
+
+  .ad-inline{margin:34px 0}
+  .ad-inline .ad-head{
+    font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+    text-align:center;margin-bottom:6px
+  }
+  .ad-inline .ad-inner{display:flex;align-items:center;gap:22px;padding:24px 26px;color:#fff;min-height:140px}
+  .ad-inline .ad-big{font-size:64px;flex-shrink:0}
+  .ad-inline h4{font-size:22px;font-weight:900;line-height:1.15;margin-bottom:6px}
+  .ad-inline p{font-size:14px;opacity:.92;margin-bottom:10px}
+  .ad-dance .ad-inner{background:linear-gradient(120deg,#5b21b6,#c026d3 60%,#f472b6)}
+  .ad-lag .ad-inner{background:linear-gradient(120deg,#0f172a,#1e3a8a);border-top:4px solid var(--yellow)}
+  .ad-lag .ad-cta{background:var(--yellow);color:var(--navy);box-shadow:0 4px 0 #b39500}
+
+  .tags-row{display:flex;flex-wrap:wrap;gap:8px;margin:34px 0 10px}
+  .tags-row a{
+    font-size:13px;font-weight:600;border:1px solid var(--line);padding:5px 12px;border-radius:999px;color:var(--muted)
+  }
+  .tags-row a:hover{border-color:var(--teal);color:var(--teal)}
+
+  /* Kapcsolódó */
+  .section-title{
+    font-size:22px;font-weight:900;margin:44px 0 18px;display:flex;align-items:center;gap:10px
+  }
+  .section-title::before{content:"";width:6px;height:24px;background:var(--yellow);border-radius:3px}
+  .related{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff;transition:transform .15s,box-shadow .15s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(13,27,42,.1)}
+  .card .thumb{aspect-ratio:16/9;display:grid;place-items:center;font-size:44px}
+  .card .c-body{padding:14px}
+  .card .c-tag{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--teal);letter-spacing:.08em}
+  .card h3{font-size:16px;line-height:1.35;font-weight:800;margin-top:6px}
+
+  /* Kommentek */
+  .comment-form{background:var(--soft);border-radius:12px;padding:18px;margin-bottom:22px}
+  .comment-form textarea{
+    width:100%;min-height:90px;border:1px solid #d5dbe3;border-radius:8px;padding:12px;font:inherit;font-size:15px;resize:vertical
+  }
+  .comment-form .row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px;flex-wrap:wrap}
+  .comment-form small{color:var(--muted);font-size:12px}
+  .comment-form button{
+    background:var(--navy);color:#fff;border:0;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer
+  }
+  .comment-form button:hover{background:var(--teal)}
+  .comment{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+  .comment .avatar{width:40px;height:40px;flex-shrink:0;font-size:14px}
+  .comment .c-head{font-size:14px;margin-bottom:4px}
+  .comment .c-head b{margin-right:8px}
+  .comment .c-head span{color:var(--muted);font-size:12px}
+  .comment p{font-size:15px;line-height:1.55}
+  .comment .c-actions{display:flex;gap:16px;margin-top:6px;font-size:13px;color:var(--muted)}
+  .comment .c-actions button{background:none;border:0;color:inherit;cursor:pointer;font:inherit}
+  .comment .c-actions button:hover{color:var(--teal)}
+
+  /* Oldalsáv */
+  aside{display:flex;flex-direction:column;gap:26px}
+  .sticky-side{position:sticky;top:90px;display:flex;flex-direction:column;gap:26px}
+  .box{border:1px solid var(--line);border-radius:12px;padding:18px}
+  .box h3{font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+  .most-read ol{list-style:none;counter-reset:n}
+  .most-read li{counter-increment:n;display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-weight:700;font-size:15px;line-height:1.35}
+  .most-read li:last-child{border-bottom:0}
+  .most-read li::before{content:counter(n);font-size:26px;font-weight:900;color:var(--teal);min-width:24px;line-height:1}
+  .most-read li a:hover{color:var(--teal)}
+
+  .ad-side .ad-inner{padding:30px 20px 22px;text-align:center;color:#fff}
+  .ad-side h4{font-size:24px;font-weight:900;line-height:1.1;margin:10px 0 8px;text-transform:uppercase}
+  .ad-side p{font-size:14px;margin-bottom:14px;opacity:.95}
+  .ad-energy .ad-inner{background:radial-gradient(circle at 50% 20%,#ff3d00,#7a0019 70%);}
+  .ad-energy .can{
+    width:70px;height:120px;margin:0 auto;border-radius:12px;
+    background:linear-gradient(90deg,#222,#555 40%,#222);border:3px solid #39ff14;
+    display:grid;place-items:center;font-weight:900;color:#39ff14;font-size:13px;writing-mode:vertical-rl;letter-spacing:.15em;
+    box-shadow:0 0 22px #39ff14
+  }
+  .ad-energy .ad-cta{background:#39ff14;color:#111;box-shadow:0 4px 0 #1e8a0a}
+  .ad-chair .ad-inner{background:linear-gradient(160deg,#00b4a6,#0d1b2a)}
+  .ad-chair .ad-cta{background:var(--yellow);color:var(--navy);box-shadow:0 4px 0 #b39500}
+  .stars{color:var(--yellow);letter-spacing:2px}
+
+  .newsletter{background:var(--navy);color:#fff;border:0}
+  .newsletter p{font-size:14px;opacity:.85;margin-bottom:12px}
+  .newsletter input{width:100%;padding:10px 12px;border-radius:8px;border:0;font:inherit;margin-bottom:8px}
+  .newsletter button{width:100%;padding:10px;border:0;border-radius:8px;background:var(--yellow);color:var(--navy);font-weight:800;cursor:pointer}
+
+  /* Lábléc */
+  footer{background:var(--navy);color:#c9d3df;padding:40px 0 30px;font-size:14px}
+  .disclaimer{
+    background:var(--yellow);color:var(--navy);border-radius:12px;padding:18px 22px;margin-bottom:30px;
+    font-weight:700;font-size:15px;line-height:1.5
+  }
+  .disclaimer strong{font-size:18px;display:block;margin-bottom:4px;font-weight:900;text-transform:uppercase}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:28px}
+  .foot-grid h5{color:#fff;font-size:14px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+  .foot-grid ul{list-style:none}
+  .foot-grid li{margin-bottom:6px}
+  .foot-grid a:hover{color:var(--yellow)}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:13px}
+
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);
+    background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-weight:600;font-size:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);transition:transform .25s;z-index:100;max-width:90vw;text-align:center
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* Reszponzív */
+  @media (max-width:1020px){
+    .layout{grid-template-columns:1fr;gap:30px}
+    .sticky-side{position:static}
+    aside{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .sticky-side{display:contents}
+    .related{grid-template-columns:repeat(2,1fr)}
+    .foot-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:820px){
+    nav{display:none;position:absolute;top:64px;left:0;right:0;background:var(--navy);padding:10px 20px 18px}
+    nav.open{display:block}
+    nav ul{flex-direction:column;gap:12px}
+    .burger{display:block}
+    .btn-support{display:none}
+    .ad-leader .ad-inner{flex-direction:column;text-align:center;padding:26px 18px}
+    .ad-leader h3{font-size:24px}
+  }
+  @media (max-width:600px){
+    .wrap{padding:0 16px}
+    aside{grid-template-columns:1fr}
+    .related{grid-template-columns:1fr}
+    .ad-inline .ad-inner{flex-direction:column;text-align:center}
+    .body p{font-size:17px}
+    .meta{flex-direction:column;align-items:flex-start}
+    .foot-grid{grid-template-columns:1fr}
+    .hero{aspect-ratio:4/3}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-row">
+    <a href="#" class="logo"><div class="logo-mark">L</div>NAPI<span class="dot">.</span>LAG</a>
+    <nav id="nav">
+      <ul>
+        <li><a href="#">Belföld</a></li>
+        <li><a href="#">Külföld</a></li>
+        <li><a href="#" class="active">Tech</a></li>
+        <li><a href="#">Gaming</a></li>
+        <li><a href="#">Kultúra</a></li>
+        <li><a href="#">Lag-jelentés</a></li>
+      </ul>
+    </nav>
+    <div class="head-actions">
+      <a href="#" class="btn-support">Támogass 1 Robuxszal</a>
+      <button class="burger" id="burger" aria-label="Menü">☰</button>
+    </div>
+  </div>
+  <div class="subnav">
+    <div class="wrap">
+      <span><b>ÉLŐ:</b> A hackerek még mindig keresik a szervereiket</span>
+      <span>Ping: 4 ms</span>
+      <span>Robux árfolyam: 1 € = 87 R$</span>
+      <span>Időjárás a szerverteremben: 41 °C, ventilátorzúgás</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- 1. hirdetés: leaderboard -->
+  <div class="ad ad-leader">
+    <span class="ad-label">Hirdetés</span>
+    <div class="ad-inner">
+      <div>
+        <h3>💸 Ingyen Robux Generátor 3000</h3>
+        <p>Csak add meg anyukád jelszavát és a kedvenc színed! 100% legit, 0% vírus*</p>
+        <div class="tiny">*a vírusok száma nem garantált. A generátor nem generál semmit.</div>
+      </div>
+      <button class="ad-cta" data-msg="Gratulálunk! Megnyerted a semmit. Soha senkinek ne add meg a jelszavad! 😉">Generálás MOST!</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <main>
+      <article>
+        <div class="breadcrumbs"><a href="#">Címlap</a> › <a href="#">Tech</a> › <a href="#">Kiberbiztonság</a></div>
+        <span class="tag">Tech</span><span class="tag teal">Kiberbiztonság</span>
+
+        <h1>Hősies helytállás az élő adásban: Fortnite-tánccal verte vissza a hackereket Turbó Tibi, kétszer is megmentve Bubut</h1>
+
+        <p class="lead">Szakértők is értetlenül állnak a példátlan kiberbiztonsági védekezés előtt, amellyel a népszerű, fiatalok körében rajongott Roblox-streamer megállította a támadókat.</p>
+
+        <div class="meta">
+          <div class="author">
+            <div class="avatar">KP</div>
+            <div>
+              <b>Kódolt Piroska</b>
+              <small>2026. november 15. – 18:31 · 4 perc olvasás</small>
+            </div>
+          </div>
+          <div class="share">
+            <button data-share="fb"><span class="ic" style="background:#1877f2">f</span>Megosztás</button>
+            <button data-share="x"><span class="ic" style="background:#000">𝕏</span>Posztolás</button>
+            <button data-share="link"><span class="ic" style="background:var(--teal)">🔗</span>Link másolása</button>
+          </div>
+        </div>
+
+        <!--
+          ===== ÉLŐ ADÁS / VIDEÓ HELYE =====
+          Ha videót szeretnél ide, írd be a YouTube-videó azonosítóját a data-youtube-id="" idézőjelei közé.
+          Az azonosító a link "v=" utáni része, pl. https://www.youtube.com/watch?v=XXXXXXXXXXX -> XXXXXXXXXXX
+          Ha üresen hagyod, a táncoló animáció látszik.
+        -->
+        <div class="hero" id="hero" data-youtube-id="hWo7Mf9GAAQ">
+          <span class="live">● ÉLŐ</span>
+          <div class="hero-scene">
+            <div class="hero-emoji">🕺</div><br>
+            <div class="err">ERROR 418: TOO MUCH DRIP – CONNECTION TERMINATED</div>
+          </div>
+        </div>
+        <p class="caption">Rekonstrukciós illusztráció a döntő pillanatról. A hackerek monitorjai ekkor már füstöltek. Fotó: Napi Lag / képernyőkép (nem)</p>
+
+        <div class="body">
+          <p>Példa nélküli kibertámadás-sorozat rázta meg a hazai streamerközösséget a hétvégén: Bubut, a „Kockaváros” nevű Roblox-szerver közkedvelt lakóját két alkalommal is összehangolt hackertámadás érte. Lapunk információi szerint az ismeretlen elkövetők első hulláma szombat este, nagyjából 19:47-kor érkezett, amikor egy gyanúsan udvarias, „Ingyen kalap, kattints ide” feliratú csomag kezdte elárasztani a szervert. Az eseményeket mintegy 12 ezer néző követte élőben – többségük a házi feladat helyett.</p>
+
+          <p>A védekezés elsőként a megszokott protokoll szerint zajlott. Előbb a tűzfal mondott csődöt, majd a második tűzfal, végül a vészhelyzetre tartogatott harmadik, amelyről utóbb kiderült, hogy valójában egy kép volt egy tűzfalról. „Ilyenkor a szakmában általában a router ki- és bekapcsolását javasoljuk – mondta lapunknak egy névtelenséget kérő informatikus. – Ezt meg is próbálták, sajnos rossz konnektort húztak ki, és a mikrohullámú sütő állt le.”</p>
+
+          <!-- 2. hirdetés: cikkbe ékelt -->
+          <div class="ad-inline ad-dance">
+            <div class="ad-head">Hirdetés</div>
+            <div class="ad">
+              <div class="ad-inner">
+                <div class="ad-big">💃</div>
+                <div>
+                  <h4>Hogyan védd meg a szervered tánccal? – 6 hetes online kurzus</h4>
+                  <p>Default Dance alapoktól a haladó Take the L-ig. Most 3 Floss-mozdulat ajándékba! Tűzfal nem szükséges.</p>
+                  <button class="ad-cta" data-msg="A kurzus jelenleg betelt. Addig is: bal kéz fel, jobb láb ki, ismétlés. 🕺">Jelentkezem</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p>Ekkor lépett színre Turbó Tibi. A streamer – aki ismert arról, mennyire elkötelezett a fiatal, családbarát Roblox-közössége iránt – kurtán közölte a chattel, hogy „most jön a végső megoldás”, majd felállt a gamerszékéből, és olyan intenzitású Default Dance-be kezdett a kamera előtt, amelyet a hazai kiberbiztonsági szakma eddig csak elméletben ismert. A szemtanúk szerint a mozdulatok pontossága és a karok lendülete már az első nyolc ütemben túlterhelte a támadók infrastruktúráját. A hackerek szerverei a látványtól sorra összeomlottak, a naplófájlokban mindössze ennyi maradt: „nem bírjuk tovább, ez túl sok”.</p>
+
+          <figure class="dance-figs">
+            <div class="dance-grid">
+              <div><img src="data:image/jpeg;base64,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" alt="Fortnite-karakter Default Dance mozdulat közben" loading="lazy"><span>1. védekezés</span></div>
+              <div><img src="data:image/jpeg;base64,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" alt="Fortnite-karakter tánc közben" loading="lazy"><span>2. védekezés</span></div>
+            </div>
+            <figcaption>A védekezés két kulcsmozdulata, kockáról kockára. A hackerek szerverei ezeknél a pillanatoknál adták fel.</figcaption>
+          </figure>
+
+          <blockquote>
+            „Harminc éve dolgozom a szakmában, de olyat még nem láttam, hogy egy DDoS-támadást egy tánc tegyen tönkre visszafelé.”
+            <cite>– Dr. Bájt Benedek, a Nemzeti Pingkutató Intézet (fiktív) vezető kutatója</cite>
+          </blockquote>
+
+          <h2>A második hullám</h2>
+
+          <p>A megkönnyebbülés azonban nem tartott sokáig. Alig negyven perccel később – miközben Bubu épp egy virtuális pizzériában újította fel a kalapgyűjteményét – az elkövetők újraszervezték magukat, és ezúttal egy botnetből érkező, 400 ezer „gg ez” üzenetből álló áradattal próbálkoztak. Turbó Tibi ekkor sem habozott: rövid nyújtás után átváltott a Take the L-re, amelyet a szakértők a kibervédelem „atomrobbanásának” neveznek. Elemzők szerint a támadók ekkor már nem csupán a szervereiket, hanem a méltóságukat is elveszítették. Bubu így másodszor is megmenekült; egyetlen kalapja sem sérült.</p>
+
+          <!-- 3. hirdetés: cikkbe ékelt -->
+          <div class="ad-inline ad-lag">
+            <div class="ad-head">Hirdetés</div>
+            <div class="ad">
+              <div class="ad-inner">
+                <div class="ad-big">🧢</div>
+                <div>
+                  <h4>LAG-ELHÁRÍTÓ ALUFÓLIA SAPKA PRO MAX</h4>
+                  <p>Klinikailag tesztelve egy macskán. Akár −200 ms pinget is ígérünk, de nem tartjuk be. RGB világítással!</p>
+                  <button class="ad-cta" data-msg="Sajnos minden sapka elkelt. Próbáld meg egy szál kábellel közvetlenül a routerhez. 📡">Kosárba</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p>Az eset nyomán a szakma két táborra szakadt. Az egyik szerint a „táncalapú incidenskezelés” (angol rövidítéssel DBIR) hamarosan bekerülhet a nemzetközi biztonsági szabványokba, a másik szerint mindez csak szerencse volt, és a hackerek egyszerűen elmentek vacsorázni. Turbó Tibi a stream végén, kissé kifulladva, mindössze annyit üzent a közösségnek: „Igyatok vizet, csináljátok meg a leckét, és sose adjátok meg senkinek a jelszavatokat.” A rendőrség egyelőre nem nyilatkozott, de egy forrásunk szerint az ügyeletes tiszt azóta is a Default Dance-t gyakorolja a folyosón.</p>
+
+          <div class="tags-row">
+            <a href="#">#kiberbiztonság</a><a href="#">#roblox</a><a href="#">#defaultdance</a><a href="#">#takethel</a><a href="#">#hősök</a><a href="#">#bubu</a>
+          </div>
+        </div>
+      </article>
+
+      <h2 class="section-title">Kapcsolódó cikkek</h2>
+      <div class="related">
+        <a href="#" class="card">
+          <div class="thumb" style="background:linear-gradient(135deg,#ffd60a,#ff8a00)">🐔</div>
+          <div class="c-body"><div class="c-tag">Belföld</div><h3>Egy tyúk 3 percig vezette a Minecraft-szervert, senki nem vette észre</h3></div>
+        </a>
+        <a href="#" class="card">
+          <div class="thumb" style="background:linear-gradient(135deg,#00b4a6,#0d1b2a)">📶</div>
+          <div class="c-body"><div class="c-tag">Tech</div><h3>Kutatók szerint a Wi-Fi gyorsabb, ha szépen kéred</h3></div>
+        </a>
+        <a href="#" class="card">
+          <div class="thumb" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">👵</div>
+          <div class="c-body"><div class="c-tag">Gaming</div><h3>Nagymama véletlenül speedrun-világrekordot döntött, miközben a receptjét kereste</h3></div>
+        </a>
+      </div>
+
+      <h2 class="section-title">Hozzászólások (<span id="ccount">3</span>)</h2>
+      <div class="comment-form">
+        <textarea id="ctext" placeholder="Írd meg a véleményed… (kulturáltan, mint egy jól betanult Default Dance)"></textarea>
+        <div class="row">
+          <small>A hozzászólásod csak a te böngésződben jelenik meg. Ez egy kamu kommentmező.</small>
+          <button id="csend">Küldés</button>
+        </div>
+      </div>
+      <div id="comments">
+        <div class="comment">
+          <div class="avatar" style="background:linear-gradient(135deg,#ff8a00,#e3002b)">KG</div>
+          <div>
+            <div class="c-head"><b>KockaGéza_2013</b><span>12 perce</span></div>
+            <p>Én is próbáltam a Default Dance-t, amikor a tesóm kilőtt a wifiről. Nem működött, csak a lámpát vertem le. Szerintem kell hozzá licenc.</p>
+            <div class="c-actions"><button class="like">👍 <span>214</span></button><button>Válasz</button></div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="avatar" style="background:linear-gradient(135deg,#00b4a6,#1e3a8a)">IT</div>
+          <div>
+            <div class="c-head"><b>Rendszergazda Feri</b><span>34 perce</span></div>
+            <p>25 év tapasztalattal mondom: ez nem így működik. Mindenesetre holnaptól a szerverterem ajtajára kiírom, hogy „Tánc közben belépni tilos”.</p>
+            <div class="c-actions"><button class="like">👍 <span>98</span></button><button>Válasz</button></div>
+          </div>
+        </div>
+        <div class="comment">
+          <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#ec4899)">AN</div>
+          <div>
+            <div class="c-head"><b>Aggódó Nagyi</b><span>1 órája</span></div>
+            <p>Az unokám elmondta, hogy ez fontos hír. Nem értem, mi az a Roblox, de büszke vagyok a fiatalemberre. Kérdés: a Take the L az ugyanaz, mint a csárdás?</p>
+            <div class="c-actions"><button class="like">👍 <span>1 337</span></button><button>Válasz</button></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside>
+      <div class="sticky-side">
+        <!-- 4. hirdetés: oldalsáv -->
+        <div class="ad ad-side ad-energy">
+          <span class="ad-label">Hirdetés</span>
+          <div class="ad-inner">
+            <div class="can">PIXEL PEZSGŐ</div>
+            <h4>Gamer Energiaital</h4>
+            <p>Most 900% több koffeinnel, mint ami ajánlott! Íze: „kék”. Mellékhatás: hallod a színeket.</p>
+            <button class="ad-cta" data-msg="A Pixel Pezsgő nem létezik. Igyál inkább vizet, ahogy Turbó Tibi is mondta. 💧">Kérem a 24-es csomagot</button>
+          </div>
+        </div>
+
+        <div class="box most-read">
+          <h3>Legolvasottabb</h3>
+          <ol>
+            <li><a href="#">Fortnite-tánccal verte vissza a hackereket Turbó Tibi</a></li>
+            <li><a href="#">A kormány bejelentette: a lag mostantól hivatalos ünnep</a></li>
+            <li><a href="#">Tíz jel, hogy a routered titokban utál téged</a></li>
+            <li><a href="#">Megszólalt a hacker: „Még mindig látom a táncot, ha lehunyom a szemem”</a></li>
+            <li><a href="#">Interjú Bubuval: „A kalapjaim jól vannak”</a></li>
+          </ol>
+        </div>
+
+        <!-- 5. hirdetés: oldalsáv -->
+        <div class="ad ad-side ad-chair">
+          <span class="ad-label">Hirdetés</span>
+          <div class="ad-inner">
+            <div style="font-size:60px">🪑</div>
+            <h4>TáncBiztos™ Gamerszék</h4>
+            <p>Katapult funkcióval, hogy vészhelyzetben 0,3 mp alatt táncpozícióba kerülj.</p>
+            <div class="stars">★★★★★</div>
+            <div class="tiny" style="margin-bottom:12px">(1 értékelés, a gyártó anyukájától)</div>
+            <button class="ad-cta" data-msg="A katapult funkciót jogi okokból kikapcsoltuk. 🚀">Megnézem</button>
+          </div>
+        </div>
+
+        <div class="box newsletter">
+          <h3>Napi Lag hírlevél</h3>
+          <p>Minden reggel 7-kor, kb. 3 másodperces késéssel.</p>
+          <input type="text" placeholder="Becenév (nem kell e-mail, ez paródia)">
+          <button id="nl">Feliratkozom</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="disclaimer">
+      A Napi Lag egy kitalált hírportál, amely nem kapcsolódik semmilyen valódi médiumhoz. Az oldalon szereplő cikk, személyek (Turbó Tibi, Bubu, Kódolt Piroska, Dr. Bájt Benedek), intézmények, idézetek, hozzászólások és hirdetett termékek mind kitaláltak; bármilyen hasonlóság a valósággal a véletlen műve. Ingyen Robux Generátor nem létezik – soha senkinek ne add meg a jelszavad!
+    </div>
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo" style="color:#fff;margin-bottom:10px"><div class="logo-mark">L</div>NAPI<span class="dot">.</span>LAG</a>
+        <p style="margin-top:10px">Független, pártatlan és teljesen kitalált. A hírek, amik sosem történtek meg – de ha megtörténnének, mi írnánk meg elsőként.</p>
+      </div>
+      <div>
+        <h5>Rovatok</h5>
+        <ul><li><a href="#">Belföld</a></li><li><a href="#">Tech</a></li><li><a href="#">Gaming</a></li><li><a href="#">Lag-jelentés</a></li></ul>
+      </div>
+      <div>
+        <h5>Rólunk</h5>
+        <ul><li><a href="#">Impresszum (kitalált)</a></li><li><a href="#">Szerkesztőség</a></li><li><a href="#">Hirdess nálunk tánccal</a></li></ul>
+      </div>
+      <div>
+        <h5>Kövess minket</h5>
+        <ul><li><a href="#">Galambposta</a></li><li><a href="#">Füstjelek</a></li><li><a href="#">Morze</a></li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>Ping: 4 ms · Dance-protokoll: aktív 🕺</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  (function(){
+    var toast=document.getElementById('toast'), t;
+    function show(msg){
+      toast.textContent=msg; toast.classList.add('show');
+      clearTimeout(t); t=setTimeout(function(){toast.classList.remove('show')},3200);
+    }
+    var hero=document.getElementById('hero'), vid=(hero.getAttribute('data-youtube-id')||'').trim();
+    if(/^[A-Za-z0-9_-]{6,20}$/.test(vid)){
+      hero.innerHTML='';
+      hero.classList.add('has-video');
+      var f=document.createElement('iframe');
+      f.src='https://www.youtube-nocookie.com/embed/'+vid+'?rel=0';
+      f.title='Élő adás – felvétel';
+      f.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      f.allowFullscreen=true;
+      f.loading='lazy';
+      hero.appendChild(f);
+      var cap=document.querySelector('.caption');
+      if(cap)cap.textContent='Felvétel az élő adásból.';
+    }
+    document.getElementById('burger').addEventListener('click',function(){
+      document.getElementById('nav').classList.toggle('open');
+    });
+    document.querySelectorAll('[data-msg]').forEach(function(b){
+      b.addEventListener('click',function(e){e.preventDefault();show(b.getAttribute('data-msg'))});
+    });
+    document.querySelectorAll('[data-share]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var url=location.href, type=b.getAttribute('data-share');
+        if(type==='fb'){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),'_blank','noopener')}
+        else if(type==='x'){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(url)+'&text='+encodeURIComponent('Fortnite-tánccal verte vissza a hackereket Turbó Tibi (paródia) 🕺'),'_blank','noopener')}
+        else{
+          if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){show('Link kimásolva! 🔗')},function(){show(url)})}
+          else{show(url)}
+        }
+      });
+    });
+    document.querySelectorAll('.like').forEach(function(b){
+      b.addEventListener('click',function(){
+        if(b.dataset.liked)return; b.dataset.liked='1';
+        var s=b.querySelector('span'), n=parseInt(s.textContent.replace(/\s/g,''),10)+1;
+        s.textContent=n.toLocaleString('hu-HU'); b.style.color='var(--teal)';
+      });
+    });
+    document.getElementById('csend').addEventListener('click',function(){
+      var ta=document.getElementById('ctext'), txt=ta.value.trim();
+      if(!txt){show('Előbb írj valamit! ✍️');return}
+      var d=document.createElement('div'); d.className='comment';
+      var av=document.createElement('div'); av.className='avatar'; av.textContent='TE';
+      var w=document.createElement('div');
+      var h=document.createElement('div'); h.className='c-head';
+      h.innerHTML='<b>Te</b><span>épp most</span>';
+      var p=document.createElement('p'); p.textContent=txt;
+      w.appendChild(h); w.appendChild(p); d.appendChild(av); d.appendChild(w);
+      var list=document.getElementById('comments'); list.insertBefore(d,list.firstChild);
+      ta.value=''; var c=document.getElementById('ccount'); c.textContent=parseInt(c.textContent,10)+1;
+      show('Hozzászólás elküldve (csak nálad látszik). 💬');
+    });
+    document.getElementById('nl').addEventListener('click',function(){show('Feliratkoztál! Az első hírlevél kb. soha érkezik. 📬')});
+  })();
+</script>
+</body>
+</html>
